@@ -1,0 +1,17 @@
+- Builder là một mẫu thiết kế (design pattern) giúp bạn tạo ra đối tượng đơn giản hơn
+
+User user = User.builder()
+    .firstName("John")
+    .lastName("Doe")
+    .username("johndoe")
+    .dob(LocalDate.of(1990, 5, 12))
+    .build();
+
+====================================================================================
+- Mapper là công cụ giúp chuyển đổi nhanh chóng từ một đối tượng này sang một đối tượng khác nhau,
+ví dụ như từ DTO (Data Object Transfer) sang Entity và ngược lại.
+- Dùng mapper để chuyển đổi giữa các lớp khác nhau, chẳng hạn như từ DTO sang Entity hoặc từ
+Entity sang ViewModel.
+
+- Chúng ta có thể dùng một thư viện như MapStruct hoặc ModelMapper để tự động ánh xạ giữa các lớp.
+

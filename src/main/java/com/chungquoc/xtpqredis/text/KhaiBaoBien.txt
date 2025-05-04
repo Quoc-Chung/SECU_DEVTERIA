@@ -1,0 +1,97 @@
+- Trong java, bên trong một class, ta có thể khai báo các cái biến
+toàn cục (biến static)
+
+- Đó là việc chúng ta sẽ khai báo các biến bên trong lớp nhưng bên ngoài mọi
+phương thức, contructor hoặc block.
+
+- Có hai loại biến toàn cục trong JAVA:
+    + Biến đối tượng (Các thuộc tính của đối tượng
+
+    public class User {
+        private String name;
+        private int age;
+    }
+
+    + Biến tĩnh :
+        + Có từ khóa static.
+
+        + Gắn với lóp, dùng chung  cho mọi đối tượng.
+
+
+    public class User {
+        public static int count = 0;
+    }
+
+- Truy cập biến static như sau: Vì nó là biến dùng chung cho cả class, nên
+chúng ta sẽ truy cập trực tiếp qua tên lớp (Hoặc qua object cũng được nhưng
+mà không nên)
+
+- Truy cập trực tiếp qua tên lớp luôn.
+
+   public class User {
+       public static int count = 0;
+   }
+
+   System.out.println(User.count);
+
+
+- Trong JAVA, chúng ta cũng có thể hoàn toàn khỏi tạo đối tượng ngay bên trong
+của lớp đó.
+- Bạn có thể khởi tạo một đối tượng là biến toàn cục của lớp, ngay khi
+khai báo.
+
+----------------------------------------------------------------------------
+
++ static predefinded object nghĩa là các đối tượng tĩnh (static) được tạo sẵn và
+định nghĩa cố định ở bên trong một class.
+
++ Chúng thường được dùng để:
+      + Tránh việc phải tạo đi tạo lại cùng một đối tượng nhiều lần.
+      + Cố định giá trị (không cho phép sửa đổi)
+      + Cải thiện hiệu năng và tính nhất quán.
+
+public class ResponseStatus {
+    private final String code;
+    private final String message;
+
+    +  Constructor private để ngăn không cho bên ngoài tạo
+    private ResponseStatus(String code, String message) {
+        this.code = code;
+        this.message = message;
+    }
+
+    + Static predefined object
+    public static final ResponseStatus SUCCESS = new ResponseStatus("200", "Success");
+    public static final ResponseStatus ERROR = new ResponseStatus("500", "Internal Server Error");
+
+}
+
+- Cách dùng :
+     ResponseStatus status = ResponseStatus.SUCCESS;
+===================================================================================================
+
+- Trong enum thì bạn cũng có thể tự tạo các static cho từng giá trị enum , bạn không
+cần new mà viết luôn cái enum tự tạo , mà nhớ là cũng phải có hàm khởi
+tạo hẳn hoi rồi mới viết được như thế nhé.
+
+
+public enum UserStatus {
+
+
+    private final String description;
+
+    UserStatus(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    ACTIVE("User is active"),
+    INACTIVE("User is inactive");
+
+}
+
+- Cách dùng: UserStatus status = UserStatus.ACTIVE;
+             System.out.println(status.getDescription());

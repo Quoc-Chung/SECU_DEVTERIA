@@ -1,0 +1,126 @@
+@Getter
+@Setter
+class User {
+    private String username;
+    private String password;
+    private String displayName;
+    private int age;
+}
+
+
+@Getter
+@Setter
+class UserDto {
+    private String username;
+    private String displayName;
+    private int age;
+}
+
+
+
+<dependency>
+    <groupId>org.mapstruct</groupId>
+    <artifactId>mapstruct</artifactId>
+    <version>1.5.5.Final</version>
+</dependency>
+
+<dependency>
+    <groupId>org.mapstruct</groupId>
+    <artifactId>mapstruct-processor</artifactId>
+    <version>1.5.5.Final</version>
+    <scope>provided</scope>
+</dependency>
+
+<!-- Plugin để sinh code -->
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.11.0</version>
+            <configuration>
+                <source>17</source> <!-- hoặc version Java bạn đang dùng -->
+                <target>17</target>
+                <annotationProcessorPaths>
+                    <path>
+                        <groupId>org.mapstruct</groupId>
+                        <artifactId>mapstruct-processor</artifactId>
+                        <version>1.5.5.Final</version>
+                    </path>
+                </annotationProcessorPaths>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+
+
+
+
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
+
+@Mapper(componentModel = "spring") // để Spring tự inject
+public interface UserMapper {
+    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
+
+    UserDto toDto(User user);
+    User toEntity(UserDto userDto);
+}
+
+
+@Service
+public class UserService {
+
+    @Autowired
+    private UserMapper userMapper;
+
+    public UserDto getUser(String username) {
+        User user = userRepository.findByUsername(username); // giả định bạn có userRepository
+        return userMapper.toDto(user);
+    }
+}
+===============================================================================================
+@Getter
+@Setter
+class User {
+    private String username;
+    private String password;
+    private int age;
+}
+
+
+@Getter
+@Setter
+class UserDto {
+    private String hoTen;
+    private int tuoi;
+}
+
+
+
+@Mapper(componentModel = "spring")
+public interface UserMapper {
+    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
+
+    @Mapping(source = "username", target = "hoTen")
+    @Mapping(source = "age", target = "tuoi")
+    UserDto toDto(User user);
+
+    @Mapping(source = "hoTen", target = "username")
+    @Mapping(source = "tuoi", target = "age")
+    User toEntity(UserDto userDto);
+}
+
+
+
+@Service
+public class UserService {
+
+    @Autowired
+    private UserMapper userMapper;
+
+    public UserDto getUserDto(String username) {
+        User user = userRepository.findByUsername(username);
+        return userMapper.toDto(user);
+    }
+}

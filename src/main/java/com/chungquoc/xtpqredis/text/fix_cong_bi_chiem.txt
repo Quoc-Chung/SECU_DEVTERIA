@@ -1,0 +1,16 @@
+netstat -ano | findstr :8088
+
+taskkill /PID <PID> /F
+
+===============================================================================
+Microsoft Windows [Version 10.0.26100.3915]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Windows\System32>netstat -ano | findstr :8088
+  TCP    0.0.0.0:8088           0.0.0.0:0              LISTENING       22220
+  TCP    [::]:8088              [::]:0                 LISTENING       22220
+
+C:\Windows\System32>taskkill /PID 22220 /F
+SUCCESS: The process with PID 22220 has been terminated.
+
+C:\Windows\System32>netstat -ano | findstr :8088

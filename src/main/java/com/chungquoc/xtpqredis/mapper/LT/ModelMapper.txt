@@ -1,0 +1,169 @@
+- Trong spring boot có các dạng khác nhau của data, nhưng cấu trúc của
+chúng gần tương tự như nhau, nên cũng dùng được thư viện này với chúng.
+
+- Chúng ta thường thấy nhất là vịệc chuyển đổi giữa Entity và DTO, chúng ta
+khi trả về dữ liệu cho client thì phải trả về DTO:
+- Tức là khi viết ResponseEntity<DTO> thì phải trả về một cái dữ liệu
+gì đó ở dạng DTO chứ không phải ở dạng Entity.
+- Để làm được điều đó thì cái quá trình chuyển đổi giữa entity và DTO sẽ
+được chúng ta cấu hình ở trong tầng service.
+
+- Sử dụng model mapper ở tầng service thôi, còn tầng controller chỉ cần
+xác định đúng cái kiểu dữ liệu trả về là OK.
+
+- Nhìn chung thì dữ liệu của thằng cu Entity và DTO nó không khác nhau
+cho lắm, hầu như cần thiết lắm thì chỉ khác mỗi tên, còn ý nghĩa của nó
+thì cũng tương đương nhau.
+  + Ví dụ như : name  <-> hoTen
+                phone <-> soDienThoai
+
+
+- Chúng ta có hai class là User (entity) và userDTO khá giống nhau , nhưng
+userDTO không có các trường nhạy cảm như password.
+
+
+@Getter
+@Setter
+class User {
+    private String username;
+    private String password;
+    private String displayName;
+    private int age;
+}
+
+
+@Getter
+@Setter
+class UserDto {
+    private String username;
+    private String displayName;
+    private int age;
+}
+
+- Làm cách nào có thể chuyển đổi từ một thằng entity với full các trường
+sang thằng DTO chỉ chứa các trường cần thiết một cách nhanh nhất:
+
+<dependency>
+    <groupId>org.modelmapper</groupId>
+    <artifactId>modelmapper</artifactId>
+    <version>2.4.4</version>
+</dependency>
+
+
+@Configuration
+public class ModelMapperConfig {
+    @Bean
+    public ModelMapper modelMapper() {
+        // Tạo object và cấu hình
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration()
+                .setMatchingStrategy(MatchingStrategies.STRICT);
+        return modelMapper;
+    }
+}
+
+
+@Service
+public class UserService {
+    @Autowired
+    private final ModelMapper mapper;
+
+    public UserDto getUser(String username) {
+        // Lấy User entity ra từ DB
+        User user = userRepository.findByUsername(username);
+
+        // Map thành DTO
+        UserDto userDto = mapper.map(user, UserDto.class);
+        return userDto;
+    }
+}
+=========================================================================
+
+@Getter
+@Setter
+class User {
+    private String username;
+    private String password;
+    private int age;
+}
+
+
+@Getter
+@Setter
+class UserDto {
+    private String hoTen;
+    private int tuoi;
+}
+
+
+
+@Configuration
+public class ModelMapperConfig {
+
+    @Bean
+    public ModelMapper modelMapper() {
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration()
+                .setMatchingStrategy(MatchingStrategies.STRICT);
+
+        + Cấu hình map từ User -> UserDto
+        modelMapper.typeMap(User.class, UserDto.class).addMappings(mapper -> {
+            mapper.map(User::getUsername, UserDto::setHoTen);
+            mapper.map(User::getAge, UserDto::setTuoi);
+        });
+
+        return modelMapper;
+    }
+}
+
+
+@Service
+public class UserService {
+    private final ModelMapper mapper;
+
+    @Autowired
+    public UserService(ModelMapper mapper) {
+        this.mapper = mapper;
+    }
+
+    public UserDto getUser(String username) {
+        User user = userRepository.findByUsername(username);
+        return mapper.map(user, UserDto.class);
+    }
+}
+===================================================================================================
+    User:
+          @Id
+          @GeneratedValue(strategy = GenerationType.UUID)
+
+          String phone;
+          LocalDate dob;
+
+    UserResponse:
+          String id;
+          String username;
+          String password;
+          String firstName;
+          String lastName;
+          String soDienThoai;
+          LocalDate ngaySinh;
+
+
+
+    @Configuration
+    public class ModelMapperConfig {
+        @Bean
+        public ModelMapper modelMapper() {
+            ModelMapper modelMapper = new ModelMapper();
+            modelMapper.getConfiguration()
+                    .setMatchingStrategy(MatchingStrategies.STRICT);
+
+            + Cấu hình map từ User -> UserDto
+            modelMapper.typeMap(User.class, UserResponse.class).addMappings(mapper -> {
+                mapper.map(User::getUsername, UserDto::setHoTen);
+                mapper.map(User::getAge, UserDto::setTuoi);
+            });
+
+            return modelMapper;
+        }
+    }

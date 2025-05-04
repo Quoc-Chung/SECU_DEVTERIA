@@ -1,0 +1,97 @@
+
+util
+   + anotation
+
+   + enum
+
+   + validator
+
+
+- Bắt đầu một ứng dụng thì sẽ setup Exception Handling đầu tiên.
+
+- Validation hiệu quả về dễ maintain cũng là một cách hết sức cần thiết,
+validate các cái dữ liệu mà người dùng nhập vào.
+
+- Chúng ta có thể tự tạo anotation để validate một đối tượng, thông thường
+thì nó sẽ có ba cách tạo hoặc có thể dùng @Pattern để so khớp :
+    +  @Pattern(regexp = "^\\d{10}$", message = "phone invalid format")
+
+======================================================================================
+- VALIDATE MỘT THẰNG BÌNH THƯỜNG XEM NÓ CÓ KHỚP SO VỚI MỘT PATTERN NÀO KHÔNG :
+
++ Bước 1: Nghĩ ra một cái validate để dùng luôn :
+
+  @Phone()
+  private String phone;
+
++ Bước 2: Tạo ra một cái anotation, sau đó thêm các anotation vào cho nó:
+  public @interface Phone {
+
+  }
+
+
+  @Documented - Chỉ định rằng anotation sẽ xuất hiện trong javadoc của field, class, method
+  sử dụng nó.
+
+  @Constraint(validatedBy = PhoneValidator.class)-Xác định class nào sẽ thực hiện
+  việc kiểm tra hợp lệ này.
+
+  @Target({ FIELD }) - cho biết anotation này sẽ được dùng ở đâu
+  @Retention(RUNTIME) - cho biết anotation này sẽ đươc giữ lại khi chạy chương trình
+
+
+
+ @Documented
+ @Constraint(validatedBy = PhoneValidator.class)
+ @Target({ FIELD })
+ @Retention(RUNTIME)
+ public @interface Phone {
+    String message() default "Số điện thoại không hợp lệ";
+    Class<?>[] groups() default {};
+    Class<? extends Payload>[] payload() default {};
+}
+
++ Viết class thực hiện việc kiểm tra ngoại lệ:
+
+
+public class PhoneValidator implements ConstraintValidator<Phone, String> {
+
+    private static final String PHONE_PATTERN = "^(0|\\+84)[0-9]{9}$";
+
+    @Override
+    public boolean isValid(String phone, ConstraintValidatorContext context) {
+        if (phone == null) return false;
+        return phone.matches(PHONE_PATTERN);
+    }
+}
+
+                                                          + anotation , kiểu dữ liệu của thằng cu validate
+public class PhoneValidator implements ConstraintValidator<Phone,String> {
+  @Override
+  public void initialize(Phone phone) {
+    ConstraintValidator.super.initialize(phone);
+  }
+
+  @Override
+  public boolean isValid(String phone, ConstraintValidatorContext context) {
+    if (phone == null || phone.isBlank()) {
+      return false;
+    }
+    String[] validPatterns = {
+        "^\\d{10}$",                      // 10 số: 0387654321
+        "^\\+84\\d{9}$",                  // +84: +84387654321
+        "^\\d{3}-\\d{3}-\\d{4}$",         // gạch ngang: 038-765-4321
+        "^\\d{3} \\d{3} \\d{4}$",         // cách: 038 765 4321
+    };
+
+    for (String pattern : validPatterns) {
+      if (phone.matches(pattern)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+}
+=====================================================================================================

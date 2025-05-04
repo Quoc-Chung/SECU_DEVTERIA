@@ -1,0 +1,46 @@
+Annotation @RequiredArgsConstructor là của Lombok, và nó dùng để tự động tạo
+constructor cho các trường final và các trường được đánh dấu với @NonNull.
+
+@RequiredArgsConstructor
+public class UserService {
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+}
+
+- Khi đó, nó tự động sinh ra contructor như sau:
+
+public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    this.userRepository = userRepository;
+    this.passwordEncoder = passwordEncoder;
+}
+
+
+@NoArgsConstructor      	Tạo constructor không có tham số
+
+@AllArgsConstructor     	Tạo constructor cho tất cả các trường
+
+@RequiredArgsConstructor	Tạo constructor cho các trường final hoặc @NonNull
+
+=========================================================================================
+import lombok.Builder;
+import lombok.Data;
+
+@Data
+@Builder
+public class User {
+    private String username;
+    private String password;
+    private String firstName;
+    private String lastName;
+}
+
+User user = User.builder()
+                .username("john123")
+                .password("123456")
+                .firstName("John")
+                .lastName("Doe")
+                .build();
+=========================================================================================
+- Su dung Map Struct để chuyển đổi giữa ENTITY và DTO một cách hiệu quả:
+
++

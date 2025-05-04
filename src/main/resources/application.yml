@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: xtpqredis
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/identity_service
+    username: root
+    password: Ch@/12345678
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+server:
+  port: 8081

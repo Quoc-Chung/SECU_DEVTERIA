@@ -1,0 +1,104 @@
+{
+1. "status": {
+      "code": "200",
+      "message": "Thành công",
+      "label": "Success"
+   },
+2. "data": {
+   },
+3. "extraData": null
+}
+
++ 1. Responstatus :
+            +  String code;
+            +  String message;
+            +  String label;
+
++ 2. ErrorResponse :
+            + Responstatus
+            + T data
+
++ 3. GeneralResponse
+           + status
+           + T data
+           + extraData
+
+- extraData là một lớp GeneralResponse<T> là một thuộc tính phụ trợ, thường dùng
+để chứa các dữ liệu mở rộng không cố định mà bạn muốn trả về thêm bên cạnh cái
+data chính.
+
+   private Map<String, Object> extraData;
+
+   + Nó dùng để thêm các dữ liệu mở rộng, bổ xung trả về cho response.
+
+- Viết một hàm tạo các đối tượng Response chuẩn :
+   ResponseEntity<GeneralResponse<T>>
+
+   GeneralPageResponse<T>
+
+   + Nó giúp chúng ta chuẩn hóa cấu trúc phản hồi (response)
+   + Tái sử dụng lại code, không phải lặp đi lặp lại việc tạo response ở mỗi
+controller.
+   + Rất dễ bảo trì, dễ thay đổi định dạng format response trong một chỗ duy
+nhất.
+
+====================================================================================================
+Tổng quan công dụng các phương thức trong ResponseFactory
+1. Response thành công (không có data):
+
+    public static <T> ResponseEntity<GeneralResponse<T>> success()
+Trả về:
+
+{
+  "status": { "code": "200", "message": "Thành công", "label": "Success" },
+  "data": null,
+  "extraData": null
+}
+
+
+
+2. Response thành công có data:
+public static <T> ResponseEntity<GeneralResponse<T>> success(T data)
+Trả về phản hồi với dữ liệu chính (data), ví dụ danh sách user, chi tiết sản phẩm...
+
+3. Response thành công có data và extraData:
+public static <T> ResponseEntity<GeneralResponse<T>> success(T data, Map<String, Object> extraData)
+→ Dùng khi bạn muốn trả thêm metadata như:
+
+"extraData": { "totalItems": 100, "note": "Some extra info" }
+
+4. Trường hợp phân quyền bị từ chối:
+
+public static <T> ResponseEntity<GeneralResponse<T>> permissionDenied(String messages)
+→ Trả mã lỗi 403, nội dung như:
+
+
+{
+  "status": { "code": "403", "message": "Không có quyền thực hiện chức năng này", "label": "Permission Denied" }
+}
+
+
+5. Response cho phân trang:
+public static <T> ResponseEntity<GeneralPageResponse<T>> makePaginationResponse(Page<T> page)
+→ Dùng khi bạn có kết quả dạng Page<T> (Spring Data JPA), sẽ trả về cả:
+
+data: danh sách thực thể.
+
+pageResponse: thông tin phân trang (pageIndex, pageSize, totalItems, ...).
+
+
+
+
+
+@GetMapping("/me")
+public ResponseEntity<?> getCurrentUser() {
+    UserDTO currentUser = userService.getCurrentUser();
+    return ResponseFactory.success(currentUser);
+}
+
+
+- Một cái lưu ý là ở tần service khi trả về data cho cái thằng controller thì mình thông
+thường sẽ không trả về cái entity mà trả về cái DTO, khi đó thì dữ liệu trả về sẽ được
+tốt hơn.
+
+-
