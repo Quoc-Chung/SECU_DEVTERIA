@@ -1,4 +1,4 @@
-package com.chungquoc.xtpqredis.dto.response;
+package com.chungquoc.xtpqredis.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AuthenticationResponse {
-     String token;
-     boolean authenticationResponse;
-
+/*- Dùng để kiểm tra xem token hợp lệ không  -*/
+public class IntrospectRequest {
+      String token;
 }
