@@ -44,8 +44,8 @@ public class UserController {
   /*- Cái get hiện tại nó đang trả về user nhưng tôi không muốn thế, tôi muốn trả về UserResponse thì làm như nào  -*/
   @GetMapping("/{userId}")
   public ResponseEntity<GeneralResponse<UserResponse>> getUser(@PathVariable("userId") String userId){
-    UserResponse userResponse = modelMapper.map(userService.getUser(userId), UserResponse.class);
-    return ResponseFactory.success(userResponse);
+    UserResponse user = userService.getUser(userId);
+    return ResponseFactory.success(user);
   }
 
   @PostMapping

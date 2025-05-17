@@ -10,6 +10,8 @@ import com.chungquoc.xtpqredis.utils.enums.ErrorCode;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -18,7 +20,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
   private final UserRepository userRepository;
 
-  private final ModelMapper mapper;
+  private final ModelMapper modelMapper;
 
 
   /*- Tạo ra một user -*/
@@ -40,15 +42,10 @@ public class UserService {
     if(userRepository.existsByUsername(request.getUsername())){
       throw new AppException(ErrorCode.USER_EXISTS);
     }
-    /*- - Chuyển đoi giua user va DTO -*/
-    //    user.setUsername(request.getUsername());
-    //    user.setPassword(request.getPassword());
-    //    user.setFirstName(request.getFirstName());
-    //    user.setLastName(request.getLastName());
-    //    user.setPhone(request.getPhone());
-    //    user.setDob(request.getDob());
+     user = modelMapper.map(request, User.class);
 
-     user = mapper.map(request, User.class);
+     PasswordEncoder passwordEncoder  = new BCryptPasswordEncoder();
+     user.setPassword(passwordEncoder.encode(request.getPassword()));
     return userRepository.save(user);
   }
 
@@ -64,7 +61,8 @@ public class UserService {
   */
 
   public User updateUser(String userId, UserUpdateRequest request) {
-    User user = getUser(userId);
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTS));
 
     /*- Hoặc có thể sử dụng model mapper để chuyển đổi -*/
     user.setId(userId);
@@ -89,10 +87,12 @@ public class UserService {
   }
 
   /*- Lấy ra một user theo id -*/
-  public User getUser(String id){
-    return userRepository.findById(id)
+  public UserResponse getUser(String id){
+    User user =  userRepository.findById(id)
         .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTS));
 
+    UserResponse userResponse = modelMapper.map(user, UserResponse.class);
+    return userResponse;
   }
 
 }

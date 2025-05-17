@@ -6,6 +6,9 @@ public enum ErrorCode {
   USER_NOT_EXISTS(345,"user có tồn tại đâu mà đòi lấy"),
 
   UNCATEGORIZE_EXCEPTION(567,"Ban dang gap loi vo van xung quanh ");
+
+
+
   private int code;
   private String message;
   ErrorCode(int code, String message) {
